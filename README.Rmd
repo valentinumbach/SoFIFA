@@ -1,0 +1,98 @@
+---
+title: "SoFIFA API for R"
+output: github_document
+---
+
+[SoFIFA.com](https://sofifa.com) offers up-to-date, detailed scores on all players 
+from [EA Sports FIFA](https://www.easports.com/fifa). 
+This package makes it easy to load that data into R -- for individual players, 
+teams, or complete leagues.
+
+## Usage
+
+The `SoFIFA` package offers 2 groups of functions. The first group will help you
+get SoFIFA.com IDs for leagues, teams, or individual players. The second group 
+will load the SoFIFA scores for those IDs.
+
+### Getting IDs
+
+To begin, you will typically start at the league level. Get all currently
+available leagues with `get_leagues()`.
+
+```{r}
+library(SoFIFA)
+leagues <- get_leagues()
+```
+
+```{r echo=FALSE}
+knitr::kable(leagues)
+```
+
+
+Let's say we're interested in the English Premier League. We will next get the
+IDs for all teams from that league with `get_teams()`, using the `league_id` we
+just got.
+
+```{r}
+teams <- get_teams(13)
+```
+
+```{r echo=FALSE}
+knitr::kable(head(teams))
+```
+
+Finally, we want to get all the player IDs for Tottenham Hotspur. We use their
+`team_id` with the `get_players()` function.
+
+```{r}
+players <- get_players(18)
+```
+
+```{r echo=FALSE}
+knitr::kable(head(players))
+```
+
+### Getting scores
+
+Of course, what we're really after are the SoFIFA scores. So we can now use the
+IDs we got in the first step.
+
+Let's start with an individual player. The `get_player_scores()` function let's 
+us collect scores from one or many players, using their `player_id`.
+Here, we're looking for the scores from Harry Kane.
+
+```{r results='hide'}
+player_scores <- get_player_scores(202126)
+```
+
+```{r echo=FALSE}
+knitr::kable(player_scores)
+```
+
+Next, we want to see scores from all players of Tottenham Hotspur. We can use
+the `get_team_scores()` function with the `team_id`.
+
+```{r results='hide'}
+team_scores <- get_team_scores(18)
+```
+
+```{r echo=FALSE}
+knitr::kable(head(team_scores))
+```
+
+Finally, we can also collect scores for all players in the Premier League. We
+user the `get_league_scores()` function with `league_id`.
+
+```{r eval=FALSE}
+league_scores <- get_league_scores(13)
+```
+
+## Installation
+
+Install from GitHub
+
+```{r eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("valentinumbach/SoFIFA")
+```
+

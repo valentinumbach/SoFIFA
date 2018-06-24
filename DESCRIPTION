@@ -1,0 +1,20 @@
+Package: SoFIFA
+Version: 0.1.0
+Title: SoFIFA API for R
+Description: SoFIFA.com offers up-to-date, detailed scores on all players
+    from EA Sports FIFA. This package makes it easy to load that data into R,
+    for individual players, teams, or complete leagues.
+Authors@R: person("Valentin", "Umbach", email = "valentin.umbach@gmail.com",
+                  role = c("aut", "cre"))
+License: GPL-3
+Depends:
+    R (>= 3.4.0)
+Imports: 
+    magrittr,
+    xml2,
+    dplyr,
+    rvest,
+    stringr
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
