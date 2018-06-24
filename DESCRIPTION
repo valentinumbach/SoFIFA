@@ -6,7 +6,7 @@ Description: SoFIFA.com offers up-to-date, detailed scores on all players
     for individual players, teams, or complete leagues.
 Authors@R: person("Valentin", "Umbach", email = "valentin.umbach@gmail.com",
                   role = c("aut", "cre"))
-License: GPL-3
+License: MIT + file LICENSE
 Depends:
     R (>= 3.4.0)
 Imports: 
