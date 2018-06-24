@@ -25,7 +25,7 @@ leagues <- get_leagues()
 ```
 
 ```{r echo=FALSE}
-knitr::kable(leagues)
+knitr::kable(head(leagues))
 ```
 
 

@@ -17,21 +17,14 @@ library(SoFIFA)
 leagues <- get_leagues()
 ```
 
-| country | league\_name        |  league\_id|
-|:--------|:--------------------|-----------:|
-| England | Premier League      |          13|
-| England | League Championship |          14|
-| England | League One          |          60|
-| England | League Two          |          61|
-| Spain   | Primera Division    |          53|
-| Spain   | Segunda Division    |          54|
-| Germany | 1. Bundesliga       |          19|
-| Germany | 2. Bundesliga       |          20|
-| Germany | 3. Bundesliga       |        2076|
-| Italy   | Serie A             |          31|
-| Italy   | Serie B             |          32|
-| France  | League 1            |          16|
-| France  | League 2            |          17|
+|  league\_id| league\_name                      |
+|-----------:|:----------------------------------|
+|           1| Danish Superliga (1)              |
+|           4| Belgian Jupiler Pro League (1)    |
+|           7| Campeonato Brasileiro Série A (1) |
+|          10| Holland Eredivisie (1)            |
+|          13| English Premier League (1)        |
+|          14| English League Championship (2)   |
 
 Let's say we're interested in the English Premier League. We will next get the IDs for all teams from that league with `get_teams()`, using the `league_id` we just got.
 

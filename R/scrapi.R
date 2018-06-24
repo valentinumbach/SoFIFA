@@ -16,7 +16,22 @@
 #' @name get_players
 #' @export
 get_leagues <- function() {
-  # load league IDs from internal data (change in /data-raw)
+  # build url
+  url <- paste0(base_url, "/leagues")
+  # read html page (overview)
+  html <- xml2::read_html(url)
+  # extract league links
+  tmp <- xml2::xml_find_all(html, xpath = "//a[contains(@href,'/league/')]")
+  # prepare empty data frame
+  leagues <- data.frame(league_id = rep(0, length(tmp)), league_name = NA)
+  # extract league IDs from links
+  leagues$league_id <- tmp %>%
+    rvest::html_attr("href") %>%
+    stringr::str_replace("/league/", "") %>%
+    as.numeric()
+  # extract league names from links
+  leagues$league_name <- rvest::html_text(tmp)
+  # return data frame
   leagues
 }
 
