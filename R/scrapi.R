@@ -19,7 +19,7 @@ get_leagues <- function() {
   # build url
   url <- paste0(base_url, "/leagues")
   # read html page (overview)
-  html <- xml2::read_html(url)
+  html <- xml2::read_html(GET_stealthy(url))
   # extract league links
   tmp <- xml2::xml_find_all(html, xpath = "//a[contains(@href,'/league/')]")
   # prepare empty data frame
@@ -41,7 +41,7 @@ get_teams <- function(league_id) {
   # build url
   url <- paste0(base_url, "/teams?lg=", league_id)
   # read html page (league overview)
-  html <- xml2::read_html(url)
+  html <- xml2::read_html(GET_stealthy(url))
   # extract team links
   tmp <- xml2::xml_find_all(html, xpath = "//a[contains(@href,'/team/')]")
   # prepare empty data frame
@@ -63,7 +63,7 @@ get_players <- function(team_id) {
   # build url
   url <- paste0(base_url, "/team/", team_id)
   # read html page (team overview)
-  html <- xml2::read_html(url)
+  html <- xml2::read_html(GET_stealthy(url))
   # extract player links
   tmp <- xml2::xml_find_all(html, xpath = "//a[contains(@href,'/player/')]")
   # prepare empty data frame
@@ -83,7 +83,7 @@ get_scores <- function(player_id) {
   # build url
   url <- paste0(base_url, "/player/", player_id)
   # read html page (player profile)
-  html <- xml2::read_html(url)
+  html <- xml2::read_html(GET_stealthy(url))
   # prepare vector with pre-defined score labels
   scores <- rep(0, length(score_labels))
   # extract scores one-by-one

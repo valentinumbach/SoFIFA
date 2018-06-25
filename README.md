@@ -75,7 +75,7 @@ player_scores <- get_player_scores(202126)
 Next, we want to see scores from all players of Tottenham Hotspur. We can use the `get_team_scores()` function with the `team_id`.
 
 ``` r
-team_scores <- get_team_scores(18)
+team_scores <- get_team_scores(18, max_results = 5)
 ```
 
 |  player\_id| player\_name      |  Overall Rating|  Potential|  Crossing|  Finishing|  Heading Accuracy|  Short Passing|  Volleys|  Dribbling|  Curve|  FK Accuracy|  Long Passing|  Ball Control|  Acceleration|  Sprint Speed|  Agility|  Reactions|  Balance|  Shot Power|  Jumping|  Stamina|  Strength|  Long Shots|  Aggression|  Interceptions|  Positioning|  Vision|  Penalties|  Composure|  Marking|  Standing Tackle|  Sliding Tackle|  GK Diving|  GK Handling|  GK Kicking|  GK Positioning|  GK Reflexes|
@@ -85,12 +85,11 @@ team_scores <- get_team_scores(18)
 |      200104| Heung Min Son     |              84|         87|        78|         85|                65|             79|       75|         87|     81|           70|            64|            85|            88|            87|       83|         84|       78|          85|       65|       85|        64|          87|          60|             39|           85|      79|         71|         80|       27|               34|              33|         11|           13|          13|               6|           10|
 |      190460| Christian Eriksen |              88|         91|        87|         81|                52|             90|       74|         84|     86|           86|            86|            89|            77|            74|       80|         86|       82|          84|       55|       91|        57|          87|          46|             56|           83|      90|         67|         87|       39|               57|              22|          9|           14|           7|               7|            6|
 |      162240| Moussa Dembélé    |              84|         84|        65|         66|                70|             86|       73|         89|     65|           55|            80|            89|            75|            77|       82|         84|       76|          85|       77|       76|        91|          71|          79|             82|           70|      80|         67|         90|       71|               83|              70|         16|           14|          11|              16|           14|
-|      202335| Eric Dier         |              81|         85|        67|         52|                83|             77|       52|         65|     54|           74|            78|            71|            70|            75|       56|         80|       40|          83|       77|       82|        88|          72|          90|             82|           53|      68|         70|         77|       79|               82|              84|         11|           14|           6|              13|            9|
 
 Finally, we can also collect scores for all players in the Premier League. We user the `get_league_scores()` function with `league_id`.
 
 ``` r
-league_scores <- get_league_scores(13)
+league_scores <- get_league_scores(13, max_results = 5)
 ```
 
 Installation

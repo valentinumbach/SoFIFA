@@ -6,14 +6,16 @@
 \alias{get_league_scores}
 \title{Get SoFIFA scores for players, teams, or complete leagues.}
 \usage{
-get_player_scores(player_ids)
+get_player_scores(player_ids, max_results = Inf)
 
-get_team_scores(team_id)
+get_team_scores(team_id, max_results = Inf)
 
-get_league_scores(league_id)
+get_league_scores(league_id, max_results = Inf)
 }
 \arguments{
 \item{player_ids}{Numeric (vector of) ID(s) obtained via \code{get_players()}.}
+
+\item{max_results}{Numeric maximum results returned. Defaults to \code{Inf}.}
 
 \item{team_id}{Numeric ID obtained via \code{get_teams()}.}
 
@@ -34,10 +36,8 @@ player_scores <- get_player_scores(202126)
 player_scores <- get_player_scores(c(202126, 211117))
 
 # get scores for all Tottenham Hotspur players
-team_scores <- get_team_scores(18)
+team_scores <- get_team_scores(18, max_results = 5)
 
-\dontrun{
 # get scores for all Premier League players
-league_scores <- get_league_scores(13)
-}
+league_scores <- get_league_scores(13, max_results = 5)
 }
