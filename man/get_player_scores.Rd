@@ -36,6 +36,8 @@ player_scores <- get_player_scores(c(202126, 211117))
 # get scores for all Tottenham Hotspur players
 team_scores <- get_team_scores(18)
 
+\dontrun{
 # get scores for all Premier League players
 league_scores <- get_league_scores(13)
+}
 }

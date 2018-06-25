@@ -15,8 +15,10 @@
 #' # get scores for all Tottenham Hotspur players
 #' team_scores <- get_team_scores(18)
 #'
+#' \dontrun{
 #' # get scores for all Premier League players
 #' league_scores <- get_league_scores(13)
+#' }
 #' @export
 get_player_scores <- function(player_ids) {
   # initialize counter for progress display

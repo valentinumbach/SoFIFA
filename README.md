@@ -1,6 +1,8 @@
 SoFIFA API for R
 ================
 
+[![Travis-CI Build Status](https://travis-ci.org/valentinumbach/SoFIFA.svg?branch=master)](https://travis-ci.org/valentinumbach/SoFIFA)
+
 [SoFIFA.com](https://sofifa.com) offers up-to-date, detailed scores on all players from [EA Sports FIFA](https://www.easports.com/fifa). This package makes it easy to load that data into R -- for individual players, teams, or complete leagues.
 
 Usage
