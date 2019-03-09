@@ -85,24 +85,16 @@ get_scores <- function(player_id) {
   # read html page (player profile)
   html <- xml2::read_html(GET_stealthy(url))
   # prepare vector with pre-defined score labels
-  scores <- rep(0, length(score_labels))
-  # extract scores one-by-one
-  for (s in 1:length(scores)) {
-    # extract score via label matching
-    tmp <- html %>%
-      rvest::html_nodes(xpath = paste0("//*[not(self::script)][text()[contains(.,'",
-                                       score_labels[s], "')]]")) %>%
-      rvest::html_children()
-    if (length(tmp) >= 1) {
-      # for multiple matches, only accept first match
-      scores[s] <- tmp[1] %>%
-        rvest::html_text() %>%
-        as.numeric()
-    } else {
-      # if there's no match, put NA
-      scores[s] <- NA
-    }
-  }
+  scores <- rep(NA, length(score_labels))
+
+  # extract scores from html text
+  text <- rvest::html_nodes(html, xpath = "//span[contains(@class, 'label p')]/..") %>%
+          rvest::html_text(trim = TRUE)
+  values <- gsub('[^0-9]', '', text) %>% as.numeric()
+  keys   <- gsub('[^a-zA-Z ]', '', text) %>% trimws()
+
+  scores = values[match(score_labels, keys)]
+
   # store scores in data frame
   scores <- as.data.frame(t(scores))
   # use score lables as column names
