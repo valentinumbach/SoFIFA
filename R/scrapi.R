@@ -89,8 +89,10 @@ get_scores <- function(player_id) {
 
   # extract scores from html text
   text <- rvest::html_nodes(html, xpath = "//span[contains(@class, 'label p')]/..") %>%
-          rvest::html_text(trim = TRUE)
-  values <- gsub('[^0-9]', '', text) %>% as.numeric()
+          rvest::html_text(trim = TRUE) %>%
+          gsub('[+-][0-9]+', '', .)
+  # parse node text
+  values <- gsub('[^0-9]',     '', text) %>% as.numeric()
   keys   <- gsub('[^a-zA-Z ]', '', text) %>% trimws()
 
   scores = values[match(score_labels, keys)]
