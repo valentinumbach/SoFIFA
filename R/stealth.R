@@ -43,10 +43,10 @@ get_proxy <- function() {
 
 get_useragent <- function() {
   if (is.null(stealth.env$useragent_list)) {
-    r <- httr::GET("https://raw.githubusercontent.com/debbbbie/useragents-rb/master/lib/useragents.txt")
-    c <- httr::content(r)
-    s <- strsplit(c, "\n")[[1]]
-    stealth.env$useragent_list <- s
+    stealth.env$useragent_list <- c(
+      'Mozilla/5.0 (X11; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0',
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36'
+    )
   }
   sample(stealth.env$useragent_list, 1)
 }
