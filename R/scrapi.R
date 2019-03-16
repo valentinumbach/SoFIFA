@@ -84,25 +84,35 @@ get_scores <- function(player_id) {
   url <- paste0(base_url, "/player/", player_id)
   # read html page (player profile)
   html <- xml2::read_html(GET_stealthy(url))
-  # prepare vector with pre-defined score labels
-  scores <- rep(NA, length(score_labels))
 
   # extract scores from html text
-  text <- rvest::html_nodes(html, xpath = "//span[contains(@class, 'label p')]/..") %>%
+  text <- rvest::html_nodes(html, xpath = "//article//span[contains(@class, 'label p')]/..") %>%
           rvest::html_text(trim = TRUE) %>%
           gsub('[+-][0-9]+', '', .)
-  # parse node text
+
+  # parse node text (remove text to get values and remove numbers to get keys)
   values <- gsub('[^0-9]',     '', text) %>% as.numeric()
   keys   <- gsub('[^a-zA-Z ]', '', text) %>% trimws()
 
-  scores = values[match(score_labels, keys)]
+  scores <- list()
+  for (scorestr in score_labels) {
+    scores[[scorestr]] <- values[match(scorestr, keys)]
+  }
 
-  # store scores in data frame
-  scores <- as.data.frame(t(scores))
-  # use score lables as column names
-  colnames(scores) <- score_labels
-  # return data frame
-  scores
+  nodes <- rvest::html_nodes(html, css = "article ul.pl li")
+  for (scorestr in score_extras) {
+    # build a query to match the label
+    q <- paste0('//label[text()="', scorestr, '"]/..')
+    # remove the matched label from the html text
+    v <- rvest::html_nodes(nodes, xpath = q) %>%
+         rvest::html_text(trim = TRUE) %>%
+         sub(scorestr, '', ., fixed = TRUE)
+    # get value and convert to numeric if possible
+    if (length(v) == 0) v <- NA
+    scores[[scorestr]] <- if (suppressWarnings(!is.na(as.numeric(v)))) as.numeric(v[1]) else v[1]
+  }
+
+  as.data.frame(scores)
 }
 
 # define base url
@@ -117,3 +127,6 @@ score_labels <- c("Overall Rating", "Potential",
                   "Aggression", "Interceptions", "Positioning", "Vision", "Penalties", "Composure",
                   "Marking", "Standing Tackle", "Sliding Tackle",
                   "GK Diving", "GK Handling", "GK Kicking", "GK Positioning", "GK Reflexes")
+
+# scores for other labels (may be non-numeric)
+score_extras <- c('Preferred Foot', 'International Reputation', 'Weak Foot', 'Body Type')
