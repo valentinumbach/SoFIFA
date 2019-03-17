@@ -19,80 +19,93 @@
 #' # get scores for all Premier League players
 #' league_scores <- get_league_scores(13, max_results = 5)
 #' @export
-get_player_scores <- function(player_ids, max_results = Inf) {
-  # initialize counter for progress display
-  i <- 1
-  for (player_id in player_ids) {
-    # progress display
-    cat("Fetching player", i, "of", length(player_ids), "\n")
-    # get player scores
-    player_scores <- get_scores(player_id)
-    # add column with player ID
-    player_scores$player_id <- player_id
-    # append data frame, if exists
-    if (!exists("all_scores")) {
-      all_scores <- player_scores
-    } else {
-      all_scores <- rbind(all_scores, player_scores)
-    }
-    # increment counter for progress display
-    i <- i + 1
-    # break for loop to deliver <= max_results
-    if (i > max_results) {
-      pkg.env$max_results_reached <- TRUE
-      break
-    }
+get_player_scores <- function(player_ids, version=NULL, exportdate=NULL) {
+  get_scores_progress <- function(progress, ...) {
+    message("Fetching player ", progress, " / ", length(player_ids))
+    get_scores(...)
   }
-  # return data frame, limit to max_results
-  head(all_scores, n = max_results)
+  i <- 1:length(player_ids)
+  if (!is.null(version) && !is.null(exportdate)) {
+    do.call(rbind, mapply(get_scores_progress, i, player_ids, version, exportdate, SIMPLIFY = FALSE))
+  }
+  else {
+    do.call(rbind, mapply(get_scores_progress, i, player_ids, SIMPLIFY = FALSE))
+  }
 }
 
 #' @rdname get_player_scores
 #' @export
-get_team_scores <- function(team_id, max_results = Inf) {
-  # get team players
-  players <- get_players(team_id)
-  # get player scores
-  scores <- get_player_scores(players$player_id, max_results)
-  # join to add player names to scores
-  team_scores <- players %>%
-    dplyr::left_join(scores, by = c("player_id"))
-  # return data frame, limit to max_results
-  head(team_scores, n = max_results)
+get_player_history <- function(player_ids) {
+  do.call(rbind, lapply(player_ids, function(pid) {
+    # build required http header
+    referer <- paste0(base_url, "/player/", pid)
+    # build url
+    url <- paste0(base_url, "/ajax.php?action=history&type=player&id=", pid)
+    # make request and parse result
+    r <- GET_stealthy(url, Referer = referer, 'X-Requested-With' = 'XMLHttpRequest')
+    versions <- jsonlite::fromJSON(httr::content(r, as = "text"))$versions
+    # note that SoFIFA uses a non-iso date format. E.g: Sep 4, 2008
+    # we will parse the dates automatically for the user
+    versions$date <- as.Date(versions$date, format=sofifa_date_fmt)
+    # add player_ids column and return
+    versions$player_ids = rep(pid, nrow(versions))
+    versions
+  }))
 }
 
 #' @rdname get_player_scores
 #' @export
-get_league_scores <- function(league_id, max_results = Inf) {
-  # get league teams
-  teams <- get_teams(league_id)
-  # initialize counter for progress display
-  i <- 1
-  for (team_id in teams$team_id) {
-    # progress display
-    cat("Fetching team", i, "of", nrow(teams), "\n")
-    # get team scores
-    team_scores <- get_team_scores(team_id, max_results)
-    # add column with team ID
-    team_scores$team_id <- team_id
-    # append data frame, if exists
-    if (!exists("scores")) {
-      scores <- team_scores
-    } else {
-      scores <- rbind(scores, team_scores)
+get_team_players <- function(team_ids, include.onloan = FALSE) {
+  do.call(rbind, mapply(function(tid, i) {
+    message("Fetching team ", i, " / ", length(team_ids))
+    # build url
+    url <- paste0(base_url, "/team/", tid)
+    # read html page (team overview)
+    html <- xml2::read_html(GET_stealthy(url))
+    # extract player names and ids from links
+    nodes <- rvest::html_nodes(html, xpath = '//article//h5[text()="Squad"]/../table//a[contains(@href,"/player/")]')
+
+    get_player_ids <- function(nodes) gsub("/player/([0-9]+).*", "\\1", rvest::html_attr(nodes, "href")) %>%
+                                      as.numeric()
+
+    get_player_names <- function(nodes) rvest::html_attr(nodes, "title")
+
+    player_ids <- get_player_ids(nodes)
+    player_names <- get_player_names(nodes)
+    # we use rep explicitly because length(team_ids) may be 0
+    tids <- rep(tid, length(player_ids))
+
+    if (include.onloan) {
+      # note that we also get the data of the team loaned to
+      table        <- rvest::html_nodes(html,  xpath = '//article//h5[text()="On Loan"]/../table')
+      player_nodes <- rvest::html_nodes(table, xpath = './/tbody//a[contains(@href,"/player/")]')
+      team_nodes   <- rvest::html_nodes(table, xpath = './/tbody//a[contains(@href,"/team/")]')
+      print(player_nodes)
+      print(team_nodes)
+
+      player_ids <- c(player_ids, get_player_ids(player_nodes))
+      player_names <- c(player_names, get_player_names(player_nodes))
+      tids <- c(tids, gsub("/team/([0-9]+).*", "\\1", rvest::html_attr(team_nodes, "href")) %>%
+                      as.numeric())
     }
-    # increment counter for progress display
-    i <- i + 1
-    # break for loop if max results reached in get_player_scores()
-    if (pkg.env$max_results_reached) break
-  }
-  # join to add team names to scores
-  league_scores <- teams %>%
-    dplyr::left_join(scores, by = c("team_id"))
-  # return data frame, limit to max results
-  head(league_scores, n = max_results)
+    data.frame(team_id=tids, player_id=player_ids, player_name=player_names)
+  }, team_ids, 1:length(team_ids), SIMPLIFY = FALSE))
 }
 
-# initialize max results check
-pkg.env <- new.env()
-pkg.env$max_results_reached <- FALSE
+#' @rdname get_players
+#' @export
+get_league_teams <- function(league_ids) {
+  do.call(rbind, lapply(league_ids, function(lid) {
+    # build url
+    url <- paste0(base_url, "/teams?lg=", lid)
+    # read html page (league overview)
+    html <- xml2::read_html(GET_stealthy(url))
+    # extract team names and ids from links
+    nodes <- rvest::html_nodes(html, xpath = "//article//a[contains(@href,'/team/')]")
+    team_ids <- gsub("/team/([0-9]+).*", "\\1", rvest::html_attr(nodes, "href")) %>% as.numeric()
+    team_names <- nodes %>% rvest::html_text()
+    # we use rep explicitly because length(team_ids) may be 0
+    lid <- rep(lid, length(team_ids))
+    data.frame(league_id=lid, team_id=team_ids, team_name=team_names)
+  }))
+}

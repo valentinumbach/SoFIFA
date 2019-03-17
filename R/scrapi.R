@@ -9,10 +9,10 @@
 #' leagues <- get_leagues()
 #'
 #' # get all Premier League teams
-#' teams <- get_teams(13)
+#' teams <- get_league_teams(13)
 #'
 #' # get all Tottenham Hotspur players
-#' players <- get_players(18)
+#' players <- get_team_players(18)
 #' @name get_players
 #' @export
 get_leagues <- function() {
@@ -21,80 +21,50 @@ get_leagues <- function() {
   # read html page (overview)
   html <- xml2::read_html(GET_stealthy(url))
   # extract league links
-  tmp <- xml2::xml_find_all(html, xpath = "//a[contains(@href,'/league/')]")
+  tmp <- xml2::xml_find_all(html, xpath = "//article//a[contains(@href,'/league/')]")
   # prepare empty data frame
   leagues <- data.frame(league_id = rep(0, length(tmp)), league_name = NA)
   # extract league IDs from links
-  leagues$league_id <- tmp %>%
-    rvest::html_attr("href") %>%
-    stringr::str_replace("/league/", "") %>%
-    as.numeric()
+  leagues$league_id <- gsub("/league/([0-9]+).*", "\\1", rvest::html_attr(tmp, "href")) %>% as.numeric()
   # extract league names from links
   leagues$league_name <- rvest::html_text(tmp)
   # return data frame
   leagues
 }
 
-#' @rdname get_players
-#' @export
-get_teams <- function(league_id) {
-  # build url
-  url <- paste0(base_url, "/teams?lg=", league_id)
-  # read html page (league overview)
-  html <- xml2::read_html(GET_stealthy(url))
-  # extract team links
-  tmp <- xml2::xml_find_all(html, xpath = "//a[contains(@href,'/team/')]")
-  # prepare empty data frame
-  teams <- data.frame(team_id = rep(0, length(tmp)), team_name = NA)
-  # extract team IDs from links
-  teams$team_id <- tmp %>%
-    rvest::html_attr("href") %>%
-    stringr::str_replace("/team/", "") %>%
-    as.numeric()
-  # extract team names from links
-  teams$team_name <- rvest::html_text(tmp)
-  # return data frame
-  teams
-}
-
-#' @rdname get_players
-#' @export
-get_players <- function(team_id) {
-  # build url
-  url <- paste0(base_url, "/team/", team_id)
-  # read html page (team overview)
-  html <- xml2::read_html(GET_stealthy(url))
-  # extract player links
-  tmp <- xml2::xml_find_all(html, xpath = "//a[contains(@href,'/player/')]")
-  # prepare empty data frame
-  players <- data.frame(player_id = rep(0, length(tmp)), player_name = NA)
-  # extract player IDs from links
-  players$player_id <- tmp %>%
-    rvest::html_attr("href") %>%
-    stringr::str_replace("/player/", "") %>%
-    as.numeric()
-  # extract player names from links
-  players$player_name <- rvest::html_attr(tmp, "title")
-  # return data frame with distinct entries (removing duplicates)
-  dplyr::distinct(players)
-}
-
-get_scores <- function(player_id) {
+get_scores <- function(player_id, version=NULL, exportdate=NULL) {
   # build url
   url <- paste0(base_url, "/player/", player_id)
+  if (!is.null(version) && !is.null(exportdate)) {
+    url <- paste0(url, "/", version, "/", exportdate)
+  }
   # read html page (player profile)
   html <- xml2::read_html(GET_stealthy(url))
 
+  scores <- list()
+  scores$player_id = player_id
+
+  # extract player name, fifa version and date of update from title
+  text <- rvest::html_node(html, xpath = "//title") %>% rvest::html_text(trim = TRUE)
+  matches <- regmatches(text, regexec('(.+) (\\(.+\\) )?FIFA (.+) ([^ ]+ [0-9]+, [0-9]+) SoFIFA', text, perl=T))[[1]]
+  if (length(matches > 0)) {
+    scores$player_name = matches[2]
+    # matches[3] is full name, but we wont use that
+    scores$fifa_version = matches[4]
+    scores$date = as.Date(matches[5], format=sofifa_date_fmt)
+  }
+
   # extract scores from html text
   text <- rvest::html_nodes(html, xpath = "//article//span[contains(@class, 'label p')]/..") %>%
-          rvest::html_text(trim = TRUE) %>%
-          gsub('[+-][0-9]+', '', .)
+          rvest::html_text(trim = TRUE)
+
+  text <- gsub('[+-][0-9]+', '', text)
 
   # parse node text (remove text to get values and remove numbers to get keys)
   values <- gsub('[^0-9]',     '', text) %>% as.numeric()
   keys   <- gsub('[^a-zA-Z ]', '', text) %>% trimws()
 
-  scores <- list()
+
   for (scorestr in score_labels) {
     scores[[scorestr]] <- values[match(scorestr, keys)]
   }
@@ -105,8 +75,8 @@ get_scores <- function(player_id) {
     q <- paste0('//label[text()="', scorestr, '"]/..')
     # remove the matched label from the html text
     v <- rvest::html_nodes(nodes, xpath = q) %>%
-         rvest::html_text(trim = TRUE) %>%
-         sub(scorestr, '', ., fixed = TRUE)
+         rvest::html_text(trim = TRUE)
+    v <- sub(scorestr, '', v, fixed = TRUE)
     # get value and convert to numeric if possible
     if (length(v) == 0) v <- NA
     scores[[scorestr]] <- if (suppressWarnings(!is.na(as.numeric(v)))) as.numeric(v[1]) else v[1]
@@ -130,3 +100,5 @@ score_labels <- c("Overall Rating", "Potential",
 
 # scores for other labels (may be non-numeric)
 score_extras <- c('Preferred Foot', 'International Reputation', 'Weak Foot', 'Body Type')
+
+sofifa_date_fmt <- '%b %d, %Y'

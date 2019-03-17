@@ -2,24 +2,24 @@
 % Please edit documentation in R/convenience.R
 \name{get_player_scores}
 \alias{get_player_scores}
-\alias{get_team_scores}
-\alias{get_league_scores}
+\alias{get_player_history}
+\alias{get_team_players}
 \title{Get SoFIFA scores for players, teams, or complete leagues.}
 \usage{
-get_player_scores(player_ids, max_results = Inf)
+get_player_scores(player_ids, version = NULL, exportdate = NULL)
 
-get_team_scores(team_id, max_results = Inf)
+get_player_history(player_ids)
 
-get_league_scores(league_id, max_results = Inf)
+get_team_players(team_ids)
 }
 \arguments{
 \item{player_ids}{Numeric (vector of) ID(s) obtained via \code{get_players()}.}
 
-\item{max_results}{Numeric maximum results returned. Defaults to \code{Inf}.}
-
 \item{team_id}{Numeric ID obtained via \code{get_teams()}.}
 
 \item{league_id}{Numeric ID obtained via \code{get_leagues()}.}
+
+\item{max_results}{Numeric maximum results returned. Defaults to \code{Inf}.}
 }
 \value{
 \code{player_scores}, \code{team_scores}, \code{league_scores},
