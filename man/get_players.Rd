@@ -27,8 +27,8 @@ Get SoFIFA IDs for leagues, teams, or players.
 leagues <- get_leagues()
 
 # get all Premier League teams
-teams <- get_teams(13)
+teams <- get_league_teams(13)
 
 # get all Tottenham Hotspur players
-players <- get_players(18)
+players <- get_team_players(18)
 }

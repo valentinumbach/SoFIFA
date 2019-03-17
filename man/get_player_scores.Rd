@@ -10,7 +10,7 @@ get_player_scores(player_ids, version = NULL, exportdate = NULL)
 
 get_player_history(player_ids)
 
-get_team_players(team_ids)
+get_team_players(team_ids, include.onloan = FALSE)
 }
 \arguments{
 \item{player_ids}{Numeric (vector of) ID(s) obtained via \code{get_players()}.}
@@ -36,8 +36,8 @@ player_scores <- get_player_scores(202126)
 player_scores <- get_player_scores(c(202126, 211117))
 
 # get scores for all Tottenham Hotspur players
-team_scores <- get_team_scores(18, max_results = 5)
+team_scores <- get_player_scores(head(get_team_players(18)$player_id, 5))
 
 # get scores for all Premier League players
-league_scores <- get_league_scores(13, max_results = 5)
+league_scores <- get_player_scores(head(get_team_players(get_league_teams(13)$team_id)$player_id, 5))
 }
