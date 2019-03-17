@@ -42,12 +42,12 @@ get_scores <- function(player_id, version=NULL, exportdate=NULL) {
 
   # extract player name, fifa version and date of update from title
   text <- rvest::html_node(html, xpath = "//title") %>% rvest::html_text(trim = TRUE)
-  matches <- regmatches(text, regexec('(.+) (\\(.+\\) )?FIFA (.+) ([^ ]+ [0-9]+, [0-9]+) SoFIFA', text, perl=T))[[1]]
+  matches <- regmatches(text, regexec('(.+) FIFA (.+) ([^ ]+ [0-9]+, [0-9]+) SoFIFA', text, perl=T))[[1]]
   if (length(matches > 0)) {
-    scores$player_name = matches[2]
+    scores$player_name = gsub(' *\\(.+\\) *', '', matches[2])
     # matches[3] is full name, but we wont use that
-    scores$fifa_version = matches[4]
-    scores$date = as.Date(matches[5], format=sofifa_date_fmt)
+    scores$fifa_version = matches[3]
+    scores$date = as.Date(matches[4], format=sofifa_date_fmt)
   }
 
   # extract scores from html text
