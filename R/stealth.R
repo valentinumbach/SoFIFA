@@ -1,26 +1,26 @@
-GET_stealthy <- function(url) {
+GET_stealthy <- function(url, ...) {
   if (is.null(stealth.env$proxy)) {
     stealth.env$proxy <- get_proxy()
   }
   if (is.null(stealth.env$useragent)) {
     stealth.env$useragent <- get_useragent()
   }
-  r <- try(httr::GET(url,
-                     httr::use_proxy(stealth.env$proxy$ip,
-                                     stealth.env$proxy$port),
-                     httr::user_agent(stealth.env$useragent)),
-           silent = TRUE)
-  while (is_error(r)) {
-    Sys.sleep(1)
-    stealth.env$proxy <- get_proxy()
-    stealth.env$useragent <- get_useragent()
+  while (TRUE) {
     r <- try(httr::GET(url,
                        httr::use_proxy(stealth.env$proxy$ip,
                                        stealth.env$proxy$port),
-                       httr::user_agent(stealth.env$useragent)),
+                       httr::user_agent(stealth.env$useragent),
+                       httr::add_headers(...)),
              silent = TRUE)
+    if (is_error(r)) {
+      Sys.sleep(1)
+      stealth.env$proxy <- get_proxy()
+      stealth.env$useragent <- get_useragent()
+    }
+    else {
+      return(r)
+    }
   }
-  return(r)
 }
 
 get_proxy <- function() {

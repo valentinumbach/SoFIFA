@@ -2,27 +2,34 @@
 % Please edit documentation in R/convenience.R
 \name{get_player_scores}
 \alias{get_player_scores}
-\alias{get_team_scores}
-\alias{get_league_scores}
+\alias{get_player_history}
+\alias{get_team_players}
+\alias{get_league_teams}
 \title{Get SoFIFA scores for players, teams, or complete leagues.}
 \usage{
-get_player_scores(player_ids, max_results = Inf)
+get_player_scores(player_ids, version = NULL, exportdate = NULL)
 
-get_team_scores(team_id, max_results = Inf)
+get_player_history(player_ids)
 
-get_league_scores(league_id, max_results = Inf)
+get_team_players(team_ids, include.onloan = FALSE)
+
+get_league_teams(league_ids)
 }
 \arguments{
-\item{player_ids}{Numeric (vector of) ID(s) obtained via \code{get_players()}.}
+\item{player_ids}{Numeric (vector of) player ID(s) obtained via \code{get_team_players()}.}
 
-\item{max_results}{Numeric maximum results returned. Defaults to \code{Inf}.}
+\item{version}{Numeric vector of game version numbers obtained via \code{get_player_history()}. Length must match that of player_ids.}
 
-\item{team_id}{Numeric ID obtained via \code{get_teams()}.}
+\item{exportdate}{Numeric vector of date IDs obtained via \code{get_player_history()}. Length must match that of player_ids.}
 
-\item{league_id}{Numeric ID obtained via \code{get_leagues()}.}
+\item{team_ids}{Numeric ID obtained via \code{get_league_teams()}.}
+
+\item{include.onloan}{Include loaned players in the result.}
+
+\item{league_ids}{Numeric ID obtained via \code{get_leagues()}.}
 }
 \value{
-\code{player_scores}, \code{team_scores}, \code{league_scores},
+\code{get_player_scores}, \code{get_team_players}, \code{get_league_teams},
   a data frame.
 }
 \description{
@@ -36,8 +43,8 @@ player_scores <- get_player_scores(202126)
 player_scores <- get_player_scores(c(202126, 211117))
 
 # get scores for all Tottenham Hotspur players
-team_scores <- get_team_scores(18, max_results = 5)
+team_scores <- get_player_scores(head(get_team_players(18)$player_id, 5))
 
 # get scores for all Premier League players
-league_scores <- get_league_scores(13, max_results = 5)
+league_scores <- get_player_scores(head(get_team_players(get_league_teams(13)$team_id)$player_id, 5))
 }

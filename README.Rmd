@@ -23,6 +23,7 @@ available leagues with `get_leagues()`.
 
 ```{r}
 library(SoFIFA)
+library(magrittr)
 leagues <- get_leagues()
 ```
 
@@ -36,7 +37,7 @@ IDs for all teams from that league with `get_teams()`, using the `league_id` we
 just got.
 
 ```{r}
-teams <- get_teams(13)
+teams <- get_league_teams(13)
 ```
 
 ```{r echo=FALSE}
@@ -47,7 +48,7 @@ Finally, we want to get all the player IDs for Tottenham Hotspur. We use their
 `team_id` with the `get_players()` function.
 
 ```{r}
-players <- get_players(18)
+players <- get_team_players(18)
 ```
 
 ```{r echo=FALSE}
@@ -72,10 +73,10 @@ knitr::kable(player_scores)
 ```
 
 Next, we want to see scores from all players of Tottenham Hotspur. We can use
-the `get_team_scores()` function with the `team_id`.
+the `get_player_scores()` function with the player id obtained from `get_team_players`.
 
 ```{r results='hide'}
-team_scores <- get_team_scores(18, max_results = 5)
+team_scores <- get_team_players(18)$player_id %>% head(5) %>% get_player_scores()
 ```
 
 ```{r echo=FALSE}
@@ -83,10 +84,13 @@ knitr::kable(head(team_scores))
 ```
 
 Finally, we can also collect scores for all players in the Premier League. We
-user the `get_league_scores()` function with `league_id`.
+use the `get_league_scores()` function with `league_id`. Note that we will use
+magrittr to avoid a bracket hell:
 
 ```{r eval=FALSE}
-league_scores <- get_league_scores(13, max_results = 5)
+league_scores <- get_league_teams(13)$team_id    %>% head(1) %>%
+                 {get_team_players(.)$player_id} %>% head(5) %>%
+                 get_player_scores()
 ```
 
 ## Installation
