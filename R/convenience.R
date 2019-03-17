@@ -1,10 +1,12 @@
 #' Get SoFIFA scores for players, teams, or complete leagues.
 #'
-#' @param player_ids Numeric (vector of) ID(s) obtained via \code{get_players()}.
-#' @param team_id Numeric ID obtained via \code{get_teams()}.
-#' @param league_id Numeric ID obtained via \code{get_leagues()}.
-#' @param max_results Numeric maximum results returned. Defaults to \code{Inf}.
-#' @return \code{player_scores}, \code{team_scores}, \code{league_scores},
+#' @param player_ids Numeric (vector of) player ID(s) obtained via \code{get_team_players()}.
+#' @param version Numeric vector of game version numbers obtained via \code{get_player_history()}. Length must match that of player_ids.
+#' @param exportdate Numeric vector of date IDs obtained via \code{get_player_history()}. Length must match that of player_ids.
+#' @param team_ids Numeric ID obtained via \code{get_league_teams()}.
+#' @param league_ids Numeric ID obtained via \code{get_leagues()}.
+#' @param include.onloan Include loaned players in the result.
+#' @return \code{get_player_scores}, \code{get_team_players}, \code{get_league_teams},
 #'   a data frame.
 #' @examples
 #' # get scores for Harry Kane
@@ -24,7 +26,7 @@ get_player_scores <- function(player_ids, version=NULL, exportdate=NULL) {
     message("Fetching player ", progress, " / ", length(player_ids))
     get_scores(...)
   }
-  i <- 1:length(player_ids)
+  i <- seq_along(player_ids)
   if (!is.null(version) && !is.null(exportdate)) {
     do.call(rbind, mapply(get_scores_progress, i, player_ids, version, exportdate, SIMPLIFY = FALSE))
   }
@@ -48,7 +50,7 @@ get_player_history <- function(player_ids) {
     # we will parse the dates automatically for the user
     versions$date <- as.Date(versions$date, format=sofifa_date_fmt)
     # add player_ids column and return
-    versions$player_ids = rep(pid, nrow(versions))
+    versions$player_id = rep(pid, nrow(versions))
     versions
   }))
 }
@@ -89,10 +91,10 @@ get_team_players <- function(team_ids, include.onloan = FALSE) {
                       as.numeric())
     }
     data.frame(team_id=tids, player_id=player_ids, player_name=player_names)
-  }, team_ids, 1:length(team_ids), SIMPLIFY = FALSE))
+  }, team_ids, seq_along(team_ids), SIMPLIFY = FALSE))
 }
 
-#' @rdname get_players
+#' @rdname get_player_scores
 #' @export
 get_league_teams <- function(league_ids) {
   do.call(rbind, lapply(league_ids, function(lid) {

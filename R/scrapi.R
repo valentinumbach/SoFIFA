@@ -1,9 +1,6 @@
-#' Get SoFIFA IDs for leagues, teams, or players.
+#' Get SoFIFA IDs for leagues
 #'
-#' @param league_id Numeric ID obtained via \code{get_leagues()}.
-#' @param team_id Numeric ID obtained via \code{get_teams()}.
-#' @return \code{leagues}, \code{teams}, \code{players},
-#'   a data frame.
+#' @return A data frame with columns \code{league_id}, \code{league_name}
 #' @examples
 #' # get all available leagues
 #' leagues <- get_leagues()
@@ -13,7 +10,6 @@
 #'
 #' # get all Tottenham Hotspur players
 #' players <- get_team_players(18)
-#' @name get_players
 #' @export
 get_leagues <- function() {
   # build url

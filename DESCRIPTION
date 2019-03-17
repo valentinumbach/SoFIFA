@@ -13,7 +13,6 @@ Imports:
     magrittr,
     httr,
     xml2,
-    dplyr,
     rvest,
     jsonlite,
 Encoding: UTF-8

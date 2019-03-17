@@ -4,6 +4,7 @@
 \alias{get_player_scores}
 \alias{get_player_history}
 \alias{get_team_players}
+\alias{get_league_teams}
 \title{Get SoFIFA scores for players, teams, or complete leagues.}
 \usage{
 get_player_scores(player_ids, version = NULL, exportdate = NULL)
@@ -11,18 +12,24 @@ get_player_scores(player_ids, version = NULL, exportdate = NULL)
 get_player_history(player_ids)
 
 get_team_players(team_ids, include.onloan = FALSE)
+
+get_league_teams(league_ids)
 }
 \arguments{
-\item{player_ids}{Numeric (vector of) ID(s) obtained via \code{get_players()}.}
+\item{player_ids}{Numeric (vector of) player ID(s) obtained via \code{get_team_players()}.}
 
-\item{team_id}{Numeric ID obtained via \code{get_teams()}.}
+\item{version}{Numeric vector of game version numbers obtained via \code{get_player_history()}. Length must match that of player_ids.}
 
-\item{league_id}{Numeric ID obtained via \code{get_leagues()}.}
+\item{exportdate}{Numeric vector of date IDs obtained via \code{get_player_history()}. Length must match that of player_ids.}
 
-\item{max_results}{Numeric maximum results returned. Defaults to \code{Inf}.}
+\item{team_ids}{Numeric ID obtained via \code{get_league_teams()}.}
+
+\item{include.onloan}{Include loaned players in the result.}
+
+\item{league_ids}{Numeric ID obtained via \code{get_leagues()}.}
 }
 \value{
-\code{player_scores}, \code{team_scores}, \code{league_scores},
+\code{get_player_scores}, \code{get_team_players}, \code{get_league_teams},
   a data frame.
 }
 \description{
