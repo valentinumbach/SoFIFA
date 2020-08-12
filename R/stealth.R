@@ -1,4 +1,7 @@
 GET_stealthy <- function(url) {
+  if (Sys.getenv("DEBUG", FALSE)) {
+    return(url)
+  }
   if (is.null(stealth.env$proxy)) {
     stealth.env$proxy <- get_proxy()
   }

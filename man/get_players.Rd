@@ -4,19 +4,21 @@
 \alias{get_players}
 \alias{get_leagues}
 \alias{get_teams}
-\alias{get_players}
 \title{Get SoFIFA IDs for leagues, teams, or players.}
 \usage{
 get_leagues()
 
 get_teams(league_id)
 
-get_players(team_id)
+get_players(team_id, include_on_loan = TRUE)
 }
 \arguments{
 \item{league_id}{Numeric ID obtained via \code{get_leagues()}.}
 
 \item{team_id}{Numeric ID obtained via \code{get_teams()}.}
+
+\item{include_on_loan}{Logical indicating if players actually on loan should
+be included. Defaults to TRUE.}
 }
 \value{
 \code{leagues}, \code{teams}, \code{players},
@@ -26,6 +28,7 @@ get_players(team_id)
 Get SoFIFA IDs for leagues, teams, or players.
 }
 \examples{
+\dontrun{
 # get all available leagues
 leagues <- get_leagues()
 
@@ -34,4 +37,5 @@ teams <- get_teams(13)
 
 # get all Tottenham Hotspur players
 players <- get_players(18)
+}
 }
