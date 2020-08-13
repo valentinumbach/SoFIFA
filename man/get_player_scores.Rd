@@ -8,9 +8,9 @@
 \usage{
 get_player_scores(player_ids, max_results = Inf)
 
-get_team_scores(team_id, max_results = Inf)
+get_team_scores(team_id, max_results = Inf, include_on_loan = TRUE)
 
-get_league_scores(league_id, max_results = Inf)
+get_league_scores(league_id, max_results = Inf, include_on_loan = TRUE)
 }
 \arguments{
 \item{player_ids}{Numeric (vector of) ID(s) obtained via \code{get_players()}.}
@@ -18,6 +18,9 @@ get_league_scores(league_id, max_results = Inf)
 \item{max_results}{Numeric maximum results returned. Defaults to \code{Inf}.}
 
 \item{team_id}{Numeric ID obtained via \code{get_teams()}.}
+
+\item{include_on_loan}{Logical indicating if players actually on loan should
+be included. Defaults to TRUE.}
 
 \item{league_id}{Numeric ID obtained via \code{get_leagues()}.}
 }
@@ -29,6 +32,7 @@ get_league_scores(league_id, max_results = Inf)
 Get SoFIFA scores for players, teams, or complete leagues.
 }
 \examples{
+\dontrun{
 # get scores for Harry Kane
 player_scores <- get_player_scores(202126)
 
@@ -40,4 +44,5 @@ team_scores <- get_team_scores(18, max_results = 5)
 
 # get scores for all Premier League players
 league_scores <- get_league_scores(13, max_results = 5)
+}
 }

@@ -4,9 +4,12 @@
 #' @param team_id Numeric ID obtained via \code{get_teams()}.
 #' @param league_id Numeric ID obtained via \code{get_leagues()}.
 #' @param max_results Numeric maximum results returned. Defaults to \code{Inf}.
+#' @param include_on_loan Logical indicating if players actually on loan should
+#'   be included. Defaults to TRUE.
 #' @return \code{player_scores}, \code{team_scores}, \code{league_scores},
 #'   a data frame.
 #' @examples
+#' \dontrun{
 #' # get scores for Harry Kane
 #' player_scores <- get_player_scores(202126)
 #'
@@ -18,23 +21,19 @@
 #'
 #' # get scores for all Premier League players
 #' league_scores <- get_league_scores(13, max_results = 5)
+#' }
 #' @export
 get_player_scores <- function(player_ids, max_results = Inf) {
   # initialize counter for progress display
   i <- 1
+  all_scores <- data.frame()
   for (player_id in player_ids) {
     # progress display
     cat("Fetching player", i, "of", length(player_ids), "\n")
     # get player scores
     player_scores <- get_scores(player_id)
-    # add column with player ID
-    player_scores$player_id <- player_id
-    # append data frame, if exists
-    if (!exists("all_scores")) {
-      all_scores <- player_scores
-    } else {
-      all_scores <- rbind(all_scores, player_scores)
-    }
+    # append data frame
+    all_scores <- rbind(all_scores, player_scores)
     # increment counter for progress display
     i <- i + 1
     # break for loop to deliver <= max_results
@@ -49,9 +48,9 @@ get_player_scores <- function(player_ids, max_results = Inf) {
 
 #' @rdname get_player_scores
 #' @export
-get_team_scores <- function(team_id, max_results = Inf) {
+get_team_scores <- function(team_id, max_results = Inf, include_on_loan = TRUE) {
   # get team players
-  players <- get_players(team_id)
+  players <- get_players(team_id, include_on_loan)
   # get player scores
   scores <- get_player_scores(players$player_id, max_results)
   # join to add player names to scores
@@ -63,24 +62,21 @@ get_team_scores <- function(team_id, max_results = Inf) {
 
 #' @rdname get_player_scores
 #' @export
-get_league_scores <- function(league_id, max_results = Inf) {
+get_league_scores <- function(league_id, max_results = Inf, include_on_loan = TRUE) {
   # get league teams
   teams <- get_teams(league_id)
   # initialize counter for progress display
   i <- 1
+  scores <- data.frame()
   for (team_id in teams$team_id) {
     # progress display
     cat("Fetching team", i, "of", nrow(teams), "\n")
     # get team scores
-    team_scores <- get_team_scores(team_id, max_results)
+    team_scores <- get_team_scores(team_id, max_results, include_on_loan)
     # add column with team ID
     team_scores$team_id <- team_id
-    # append data frame, if exists
-    if (!exists("scores")) {
-      scores <- team_scores
-    } else {
-      scores <- rbind(scores, team_scores)
-    }
+    # append data frame
+    scores <- rbind(scores, team_scores)
     # increment counter for progress display
     i <- i + 1
     # break for loop if max results reached in get_player_scores()
@@ -88,7 +84,7 @@ get_league_scores <- function(league_id, max_results = Inf) {
   }
   # join to add team names to scores
   league_scores <- teams %>%
-    dplyr::left_join(scores, by = c("team_id"))
+    dplyr::left_join(scores, by = c("team_id"), suffix = c("_team", "_player"))
   # return data frame, limit to max results
   head(league_scores, n = max_results)
 }
